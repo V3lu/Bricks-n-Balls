@@ -31,20 +31,22 @@ public class PlayerBehaviour : MonoBehaviour
     {
         Vector2 move = new Vector2(_moveInput.x, 0);
         _rigidbody.linearVelocity = move * _speed;
-        HandleKiwiShooting();
         UpdateAnimation(move);
+        HandleKiwiShooting();
+    }
+
+    private void HandleKiwiShooting()
+    {
+        if(Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            Instantiate(_kiwiProjectile, this.gameObject.transform.position, Quaternion.identity);
+        }
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
         _moveInput = context.ReadValue<Vector2>();
     }
-
-    private void HandleKiwiShooting()
-    {
-
-    }
-
     private void UpdateAnimation(Vector2 move)
     {
         _animator.SetFloat("MoveX", move.x);
@@ -63,6 +65,13 @@ public class PlayerBehaviour : MonoBehaviour
         {
             _spriteRenderer.flipX = false;
             _animator.SetInteger("MoveXINT", 1);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if(collision.TryGetComponent<KiwiBehaviour>(out var kiwiProj)){
+            kiwiProj.GetComponent<CircleCollider2D>().isTrigger = false;
         }
     }
 }
